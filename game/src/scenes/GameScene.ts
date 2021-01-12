@@ -1,14 +1,15 @@
 import Phaser from "phaser";
+import { Player } from "~/classes/Player";
 
 export default class GameScene extends Phaser.Scene {
   map: Phaser.Tilemaps.Tilemap | null;
   tiles: Phaser.Tilemaps.Tileset | null;
   backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
-  player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | null;
+  player: Player | null;
   cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
 
   constructor() {
-    super("hello-world");
+    super("Game");
     this.map = null;
     this.tiles = null;
     this.backgroundLayer = null;
@@ -16,45 +17,14 @@ export default class GameScene extends Phaser.Scene {
     this.cursors = null;
   }
 
-  preload() {
-    this.loadTileMap();
-    this.loadImages();
-    this.load.spritesheet("characters", "images/characters.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-  }
-
   create() {
     this.createMap();
-    this.player = this.physics.add.image(32, 32, "characters", 7);
-    this.player.setScale(2);
-    this.player.body.setCollideWorldBounds(true);
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.player = new Player(this, 32, 32, "characters", 0);
   }
 
   update() {
-    this.player?.setVelocity(0);
-
-    if (this.cursors?.left.isDown) {
-      this.player?.setVelocityX(-160);
-    } else if (this.cursors?.right.isDown) {
-      this.player?.setVelocityX(160);
-    }
-
-    if (this.cursors?.up.isDown) {
-      this.player?.setVelocityY(-160);
-    } else if (this.cursors?.down.isDown) {
-      this.player?.setVelocityY(160);
-    }
-  }
-
-  loadImages() {
-    this.load.image("background", "level/background-extruded.png");
-  }
-
-  loadTileMap() {
-    this.load.tilemapTiledJSON("map", "level/test.json");
+    this.player?.update(this.cursors as Phaser.Types.Input.Keyboard.CursorKeys);
   }
 
   createMap() {

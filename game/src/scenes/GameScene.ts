@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { Player } from "../classes/Player";
 import { Map } from "../classes/Map";
+import { Socket } from "socket.io-client";
+import { Game } from "../classes/Game";
 
 export default class GameScene extends Phaser.Scene {
   map: Map | null;
@@ -8,9 +10,11 @@ export default class GameScene extends Phaser.Scene {
   backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
   player: Player | null;
   cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
+  socket: Socket;
 
-  constructor() {
+  constructor(socket: Socket) {
     super("Game");
+    this.socket = socket;
     this.map = null;
     this.tiles = null;
     this.backgroundLayer = null;
@@ -18,10 +22,15 @@ export default class GameScene extends Phaser.Scene {
     this.cursors = null;
   }
 
+  init() {
+    this.socket = (this.sys.game as Game).socket;
+  }
+
   create() {
     this.createMap();
     this.createInputs();
     this.createPlayer();
+    this.socket.emit("health", "Health check");
   }
 
   update() {

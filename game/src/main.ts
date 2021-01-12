@@ -1,7 +1,7 @@
-import Phaser, { Game } from "phaser";
-
+import Phaser from "phaser";
 import GameScene from "./scenes/GameScene";
 import BootScene from "./scenes/BootScene";
+import { Game } from "./classes/Game";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -14,6 +14,10 @@ const config: Phaser.Types.Core.GameConfig = {
     },
   },
   scene: [BootScene, GameScene],
+  render: {
+    pixelArt: true,
+    roundPixels: true,
+  },
 };
 
-export default new Phaser.Game(config);
+export default new Game(config);

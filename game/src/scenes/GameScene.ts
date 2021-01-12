@@ -1,8 +1,9 @@
 import Phaser from "phaser";
-import { Player } from "~/classes/Player";
+import { Player } from "../classes/Player";
+import { Map } from "../classes/Map";
 
 export default class GameScene extends Phaser.Scene {
-  map: Phaser.Tilemaps.Tilemap | null;
+  map: Map | null;
   tiles: Phaser.Tilemaps.Tileset | null;
   backgroundLayer: Phaser.Tilemaps.TilemapLayer | null;
   player: Player | null;
@@ -19,25 +20,29 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.createMap();
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.player = new Player(this, 32, 32, "characters", 0);
+    this.createInputs();
+    this.createPlayer();
   }
 
   update() {
     this.player?.update(this.cursors as Phaser.Types.Input.Keyboard.CursorKeys);
   }
 
-  createMap() {
-    this.map = this.make.tilemap({ key: "map" });
-    this.tiles = this.map.addTilesetImage(
-      "background",
-      "background",
+  createInputs() {
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  createPlayer() {
+    this.player = new Player(
+      this,
       32,
       32,
-      1,
-      2
+      "characters",
+      Math.floor(Math.random() * 23)
     );
-    this.backgroundLayer = this.map.createLayer("background", this.tiles, 0, 0);
-    this.backgroundLayer.setScale(2);
+  }
+
+  createMap() {
+    this.map = new Map(this, "map", "background", "background");
   }
 }

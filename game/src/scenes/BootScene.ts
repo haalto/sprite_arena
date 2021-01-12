@@ -6,10 +6,7 @@ export default class BootScene extends Phaser.Scene {
   preload() {
     this.loadTileMap();
     this.loadImages();
-    this.load.spritesheet("characters", "images/characters.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
+    this.loadSpriteSheets();
   }
 
   create() {
@@ -18,6 +15,13 @@ export default class BootScene extends Phaser.Scene {
 
   loadImages() {
     this.load.image("background", "level/background-extruded.png");
+  }
+
+  loadSpriteSheets() {
+    this.load.spritesheet("characters", "images/characters.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
   }
 
   loadTileMap() {

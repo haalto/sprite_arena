@@ -27,7 +27,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.createMap();
-    this.player = this.physics.add.image(32, 32, "characters", 3);
+    this.player = this.physics.add.image(32, 32, "characters", 7);
     this.player.setScale(2);
     this.player.body.setCollideWorldBounds(true);
     this.cursors = this.input.keyboard.createCursorKeys();

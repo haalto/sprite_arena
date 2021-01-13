@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer, Server } from "http";
-import { Server as SocketServer, Socket } from "socket.io";
+import { Server as SocketServer } from "socket.io";
+import GameManager from "./classes/GameManager";
 const PORT = 4000;
 
 const app = express();
@@ -11,16 +12,8 @@ const io = new SocketServer(server as Server, {
   },
 });
 
-io.on("connection", (socket: Socket) => {
-  console.log(`${socket.id} connected `);
-  socket.on("disconnect", () => {
-    console.log(`${socket.id} disconnected`);
-  });
-
-  socket.on("health", (data: string) => {
-    console.log(data);
-  });
-});
+const gameManager = new GameManager(io);
+gameManager.setup();
 
 app.get("/health", (_, res) => {
   res.end("OK");

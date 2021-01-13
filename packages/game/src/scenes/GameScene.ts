@@ -31,6 +31,10 @@ export default class GameScene extends Phaser.Scene {
     this.createInputs();
     this.createPlayer();
     this.socket.emit("health", "Health check");
+
+    this.socket.on("game-state", (gameState) => {
+      this.updateGameState(gameState);
+    });
   }
 
   update() {
@@ -50,6 +54,10 @@ export default class GameScene extends Phaser.Scene {
       Math.floor(Math.random() * 23)
     );
   }
+
+  updateGameState(gameState) {}
+
+  updatePlayers() {}
 
   createMap() {
     this.map = new Map(this, "map", "background", "background");

@@ -1,12 +1,19 @@
 import { Server, Socket } from "socket.io";
+import ParticleModel from "./ParticleModel";
 import PlayerModel from "./PlayerModel";
+import { v4 } from "uuid";
 
 interface GameState {
-  players: Player;
+  players: Players;
+  particles: Particles;
 }
 
-interface Player {
+interface Players {
   [key: string]: PlayerModel;
+}
+
+interface Particles {
+  [key: string]: ParticleModel;
 }
 
 interface QueryParams {
@@ -19,11 +26,11 @@ export default class GameManager {
   io: Server;
   gameState: GameState;
   gameViewsIds: string[];
-  TICK_RATE = 15.6;
+  TICK_RATE = 16.667;
 
   constructor(io: Server) {
     this.io = io;
-    this.gameState = { players: {} };
+    this.gameState = { players: {}, particles: {} };
     this.gameViewsIds = [];
   }
 
@@ -45,23 +52,36 @@ export default class GameManager {
           this.gameViewsIds.splice(this.gameViewsIds.indexOf(socket.id), 1);
         } else {
           delete this.gameState.players[socket.id];
+          if (this.gameViewsIds.length !== 0) {
+            this.gameViewsIds.forEach((id) => {
+              this.io.to(id).emit("player-disconnected", socket.id);
+            });
+          }
         }
 
         console.log(`${socket.id} disconnected`);
       });
 
       socket.on("player-move-angle", (moveAngle: number) => {
-        console.log(moveAngle);
         this.gameState.players[socket.id].moveAngle = moveAngle;
       });
 
       socket.on("player-aim-angle", (aimAngle: number) => {
-        console.log(aimAngle);
         this.gameState.players[socket.id].aimAngle = aimAngle;
       });
 
       socket.on("player-aim-release", () => {
-        console.log("release");
+        const player = this.gameState.players[socket.id];
+        const particle = new ParticleModel(
+          v4(),
+          player,
+          player.x,
+          player.y,
+          3,
+          player.aimAngle,
+          25
+        );
+        this.gameState.particles[particle.id] = particle;
       });
 
       socket.on("health", (data: string) => {
@@ -73,6 +93,11 @@ export default class GameManager {
   async gameLoop(): Promise<void> {
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      if (Object.keys(this.gameState.players).length !== 0) {
+        this.updatePlayers();
+        this.updateParticles();
+      }
+
       if (this.gameViewsIds.length !== 0) {
         this.gameViewsIds.forEach((id) => {
           this.io.to(id).emit("game-state", this.gameState);
@@ -90,6 +115,19 @@ export default class GameManager {
 
   addPlayer(newPlayer: PlayerModel): void {
     this.gameState.players[newPlayer.id] = newPlayer;
+    this.tick;
+  }
+
+  updatePlayers(): void {
+    Object.keys(this.gameState.players).forEach((id) => {
+      this.gameState.players[id].update();
+    });
+  }
+
+  updateParticles(): void {
+    Object.keys(this.gameState.particles).forEach((id) => {
+      this.gameState.particles[id].update();
+    });
   }
 
   addClient(clientType: ClientType, id: string): void {

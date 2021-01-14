@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export class Player extends Phaser.Physics.Arcade.Image {
+export class Particle extends Phaser.Physics.Arcade.Image {
   id: string;
   scene: Phaser.Scene;
   velocity: number;
@@ -15,10 +15,10 @@ export class Player extends Phaser.Physics.Arcade.Image {
   ) {
     super(scene, x, y, key, frame);
     this.id = id;
-    this.velocity = 160;
+    this.velocity = 3;
     this.scene = scene;
     /*     this.scene.physics.world.enable(this); */
-    this.setScale(2);
+    this.setScale(1);
     /*     ((this as unknown) as Phaser.Types.Physics.Arcade.ImageWithDynamicBody).body.setCollideWorldBounds(
       true
     ); */

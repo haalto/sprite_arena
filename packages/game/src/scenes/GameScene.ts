@@ -104,11 +104,21 @@ export default class GameScene extends Phaser.Scene {
     });
 
     (this.leftJoystick as JoystickManager).on("move", (evt, nipple) => {
-      console.log("1");
+      const moveAngle = nipple.angle.radian;
+      this.socket.emit("player-move-angle", moveAngle);
+    });
+
+    (this.leftJoystick as JoystickManager).on("end", () => {
+      this.socket.emit("player-move-angle", null);
     });
 
     (this.rightJoystick as JoystickManager).on("move", (evt, nipple) => {
-      console.log("2");
+      const aimAngle = nipple.angle.radian;
+      this.socket.emit("player-aim-angle", aimAngle);
+    });
+
+    (this.rightJoystick as JoystickManager).on("end", (evt, nipple) => {
+      this.socket.emit("player-aim-release");
     });
   }
 

@@ -27,6 +27,7 @@
   "dependencies": {
     "@types/socket.io-client": "^1.4.35",
     "classes": "^0.3.0",
+    "nipplejs": "^0.9.0",
     "phaser": "^3.50.1",
     "socket.io-client": "^3.0.5"
   },

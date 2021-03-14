@@ -17,21 +17,21 @@ interface Particles {
 }
 
 interface QueryParams {
-  clientType: "controller" | "game";
+  clientType: "game";
 }
 
-type ClientType = "controller" | "game";
+type ClientType = "game";
 
 export default class GameManager {
   io: Server;
   gameState: GameState;
-  gameViewsIds: string[];
+  gamePlayers: string[];
   TICK_RATE = 16.667;
 
   constructor(io: Server) {
     this.io = io;
     this.gameState = { players: {}, particles: {} };
-    this.gameViewsIds = [];
+    this.gamePlayers = [];
   }
 
   setup(): void {
@@ -49,16 +49,14 @@ export default class GameManager {
 
       socket.on("disconnect", () => {
         if (clientType === "game") {
-          this.gameViewsIds.splice(this.gameViewsIds.indexOf(socket.id), 1);
-        } else {
+          this.gamePlayers.splice(this.gamePlayers.indexOf(socket.id), 1);
           delete this.gameState.players[socket.id];
-          if (this.gameViewsIds.length !== 0) {
-            this.gameViewsIds.forEach((id) => {
+          if (this.gamePlayers.length !== 0) {
+            this.gamePlayers.forEach((id) => {
               this.io.to(id).emit("player-disconnected", socket.id);
             });
           }
         }
-
         console.log(`${socket.id} disconnected`);
       });
 
@@ -98,8 +96,8 @@ export default class GameManager {
         this.updateParticles();
       }
 
-      if (this.gameViewsIds.length !== 0) {
-        this.gameViewsIds.forEach((id) => {
+      if (this.gamePlayers.length !== 0) {
+        this.gamePlayers.forEach((id) => {
           this.io.to(id).emit("game-state", this.gameState);
         });
       }
@@ -131,13 +129,8 @@ export default class GameManager {
   }
 
   addClient(clientType: ClientType, id: string): void {
-    if (clientType === "game" && !this.gameViewsIds.includes(id)) {
-      console.log("create game client");
-      this.gameViewsIds.push(id);
-    }
-
-    if (clientType === "controller" && !this.gameState.players[id]) {
-      console.log("create player");
+    if (clientType === "game" && !this.gameState.players[id]) {
+      this.gamePlayers.push(id);
       const newPlayer = new PlayerModel(
         id,
         32,

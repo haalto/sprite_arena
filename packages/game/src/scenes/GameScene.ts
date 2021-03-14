@@ -4,6 +4,7 @@ import { Map } from "../classes/Map";
 import { Socket } from "socket.io-client";
 import { Game } from "../classes/Game";
 import { Particle } from "~/classes/Particle";
+import nipplejs, { JoystickManager } from "nipplejs";
 
 interface PlayerModel {
   id: string;
@@ -42,6 +43,8 @@ export default class GameScene extends Phaser.Scene {
   particles: Particles;
   socket: Socket;
   gameState: GameState;
+  leftJoystick: JoystickManager | null;
+  rightJoystick: JoystickManager | null;
 
   constructor(socket: Socket) {
     super("Game");
@@ -52,6 +55,8 @@ export default class GameScene extends Phaser.Scene {
     this.backgroundLayer = null;
     this.players = {};
     this.particles = {};
+    this.leftJoystick = null;
+    this.rightJoystick = null;
   }
 
   init() {
@@ -60,6 +65,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.createMap();
+    this.createJoysticks();
     this.setUpEventListeners();
     this.update();
   }
@@ -69,11 +75,40 @@ export default class GameScene extends Phaser.Scene {
     this.updateParticles(this.gameState);
   }
 
+  createJoysticks() {
+    const leftJoystickZone = document.createElement("div");
+    leftJoystickZone.style.width = "300px";
+    leftJoystickZone.style.height = "100%";
+    leftJoystickZone.style.border = "1px solid green";
+    this.add.dom(150, 320, leftJoystickZone);
+
+    const rightJoystickZone = document.createElement("div");
+    rightJoystickZone.style.width = "300px";
+    rightJoystickZone.style.height = "100%";
+    rightJoystickZone.style.border = "1px solid red";
+    this.add.dom(490, 320, rightJoystickZone);
+
+    this.leftJoystick = nipplejs.create({
+      zone: leftJoystickZone,
+    });
+
+    this.rightJoystick = nipplejs.create({
+      zone: rightJoystickZone,
+    });
+  }
+
   setUpEventListeners() {
     this.socket.emit("health", "Health check");
-
     this.socket.on("game-state", (gameState) => {
       this.gameState = gameState;
+    });
+
+    (this.leftJoystick as JoystickManager).on("move", (evt, nipple) => {
+      console.log("1");
+    });
+
+    (this.rightJoystick as JoystickManager).on("move", (evt, nipple) => {
+      console.log("2");
     });
   }
 
@@ -113,7 +148,6 @@ export default class GameScene extends Phaser.Scene {
   updateParticles(gameState: GameState) {
     Object.keys(gameState.particles).forEach((id) => {
       //Create new particle
-      console.log(id);
       if (this.particles[id] === undefined) {
         const newParticle = gameState.particles[id];
         this.particles[newParticle.id] = new Particle(

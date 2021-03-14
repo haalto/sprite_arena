@@ -6,7 +6,7 @@
     "controller": "yarn workspace controller start",
     "server": "yarn workspace server watch",
     "game": "yarn workspace game start",
-    "start": "concurrently --kill-others-on-fail \"yarn server\"  \"yarn game\"  \"yarn controller\"",
+    "start": "concurrently --kill-others-on-fail \"yarn server\"  \"yarn game\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

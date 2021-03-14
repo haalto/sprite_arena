@@ -18,6 +18,10 @@ const config: Phaser.Types.Core.GameConfig = {
     pixelArt: true,
     roundPixels: true,
   },
+  parent: "moro",
+  dom: {
+    createContainer: true,
+  },
 };
 
 export default new Game(config);
